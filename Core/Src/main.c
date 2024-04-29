@@ -56,10 +56,9 @@ TIM_HandleTypeDef htim4;
 
 /* USER CODE BEGIN PV */
 //const unsigned uint_8 kanaly[] = {TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1};
-const int kanaly[] = { 0x00000004U, 0x00000008U, 0x0000000CU, 0x00000000U };
-int idx = 0;
+//const int kanaly[] = { 0x00000004U, 0x00000008U, 0x0000000CU, 0x00000000U };
+const int kanaly[4] = { TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1 };
 volatile int delay = 10;
-
 volatile Mod_t aktualny_mod;
 /* USER CODE END PV */
 
@@ -121,7 +120,6 @@ int main(void) {
 	/* Infinite loop */
 
 	/* USER CODE BEGIN WHILE */
-
 	while (1) {
 		if (aktualny_mod == MODE_VSETKY_NARAZ) {
 			for (int i = 0; i < 100; ++i) {
