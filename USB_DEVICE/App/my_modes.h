@@ -1,0 +1,5 @@
+typedef enum {
+	MODE_VSETKY_NARAZ,
+	MODE_POSTUPNE,
+	STROBOSKOP
+} Mod_t;

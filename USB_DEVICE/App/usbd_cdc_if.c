@@ -19,10 +19,10 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
+#include <my_modes.h>
 #include "usbd_cdc_if.h"
 #include <stdio.h>
 /* USER CODE BEGIN INCLUDE */
-
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -31,8 +31,10 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-extern uint8_t buffer[64];
+extern int kanaly[];
 extern int delay;
+extern Mod_t aktualny_mod;
+extern TIM_HandleTypeDef htim4;
 /* USER CODE END PV */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -266,6 +268,12 @@ static int8_t CDC_Receive_FS(uint8_t *Buf, uint32_t *Len) {
 		vypis_aktualnu_rychlost();
 	}
 
+	if (Buf[0] == 'm') {
+		vypni_vsetky_ledky();
+		aktualny_mod = (aktualny_mod + 1) % 3;
+		vypis_aktualny_mod();
+	}
+
 	return (USBD_OK);
 	/* USER CODE END 6 */
 }
@@ -333,6 +341,27 @@ void vypis_aktualnu_rychlost() {
 	char data[23]; // 23 lebo string bude mat dlzku maximalne 23
 	snprintf(data, 23, "Aktualna rychlost: %d\r\n", 15 - delay);
 	CDC_Transmit_FS(data, strlen(data)); // posielam
+}
+
+void vypis_aktualny_mod() {
+	char str[25];
+	uint8_t *data;
+	if (aktualny_mod == MODE_VSETKY_NARAZ) {
+		data = "Aktualny mod: vsetky naraz\r\n";
+	}
+	if (aktualny_mod == MODE_POSTUPNE) {
+		data = "Aktualny mod: postupne\r\n";
+	}
+	if (aktualny_mod == STROBOSKOP) {
+		data = "Aktualny mod: stroboskop\r\n";
+	}
+	CDC_Transmit_FS(data, strlen(data));
+}
+
+void vypni_vsetky_ledky() {
+	for (int i = 0; i < 4; i++) {
+		__HAL_TIM_SET_COMPARE(&htim4, kanaly[i], 0);
+	}
 }
 
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
