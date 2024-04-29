@@ -26,14 +26,13 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "my_modes.h"
+
 #include "usbd_cdc_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-typedef enum {
-	MODE_VSETKY_NARAZ, MODE_POSTUPNE, STROBOSKOP
-} Mod_t;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -59,10 +58,9 @@ TIM_HandleTypeDef htim4;
 //const unsigned uint_8 kanaly[] = {TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1};
 const int kanaly[] = { 0x00000004U, 0x00000008U, 0x0000000CU, 0x00000000U };
 int idx = 0;
-int delay = 10;
+volatile int delay = 10;
 
-uint8_t buffer[64];
-Mod_t aktualny_mod;
+volatile Mod_t aktualny_mod;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -78,25 +76,7 @@ static void MX_TIM4_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void write_debug(const char *text, ...) {
-	unsigned int MAX_LINE_LENGTH = 1024;
-	char buffer[MAX_LINE_LENGTH];
-	memset(buffer, 0, MAX_LINE_LENGTH);
 
-	va_list ap;
-	va_start(ap, text);
-	vsnprintf(buffer, MAX_LINE_LENGTH, text, ap);
-	va_end(ap);
-
-	asm volatile (
-			" mov r0, 0x4 \n"
-			" mov r1, %[msg] \n"
-			" bkpt #0xAB"
-			:
-			: [msg] "r" (buffer)
-			: "r0", "r1"
-	);
-}
 /* USER CODE END 0 */
 
 /**
@@ -141,22 +121,8 @@ int main(void) {
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
-//		CDC_Transmit_FS(buffer[0], strlen(buffer[0]));
-//		HAL_Delay(500);
-
-//		if (buffer[0] == "1") {
-//			uint8_t *data = "True";
-//			CDC_Transmit_FS(data, strlen(data));
-//
-//		}else{
-//			uint8_t *data = "False";
-//			CDC_Transmit_FS(data, strlen(data));
-//		}
-
-//		HAL_Delay(500);
-
-//		dobry kod :))))
-
+// hello world:)
+// danka test
 
 		if (aktualny_mod == MODE_VSETKY_NARAZ) {
 			for (int i = 0; i < 100; ++i) {
@@ -167,14 +133,34 @@ int main(void) {
 				HAL_Delay(delay);
 			}
 
-			for (int i = 100; i > 0; i--) {
+			for (int i = 100; i >= 0; i--) {
 				__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, i * 10);
 				__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, i * 10);
 				__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, i * 10);
 				__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, i * 10);
 				HAL_Delay(delay);
 			}
-			write_debug("Delay: %d\n", delay);
+		} else if (aktualny_mod == MODE_POSTUPNE) {
+
+			for (int i = 0; i < 4; i++) {
+				for (int j = 0; j < 100; ++j) {
+					__HAL_TIM_SET_COMPARE(&htim4, kanaly[i], j * 10);
+					HAL_Delay(delay);
+				}
+				for (int j = 100; j >= 0; j--) {
+					__HAL_TIM_SET_COMPARE(&htim4, kanaly[i], j * 10);
+					HAL_Delay(delay);
+				}
+
+			}
+		} else if (aktualny_mod == STROBOSKOP) {
+			for (int i = 0; i < 4; i++) {
+				__HAL_TIM_SET_COMPARE(&htim4, kanaly[i], 0);
+			}
+			HAL_Delay(delay);
+			for (int i = 0; i < 4; i++) {
+				__HAL_TIM_SET_COMPARE(&htim4, kanaly[i], 1000);
+			}
 		}
 
 		/* USER CODE END WHILE */
