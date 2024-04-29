@@ -155,7 +155,7 @@ int main(void) {
 
 //		HAL_Delay(500);
 
-//		dobry kod :)
+//		dobry kod :))
 
 
 		if (aktualny_mod == MODE_VSETKY_NARAZ) {
