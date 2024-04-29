@@ -154,7 +154,7 @@ int main(void) {
 //		}
 
 //		HAL_Delay(500);
-
+//		zdravim svet
 
 		if (aktualny_mod == MODE_VSETKY_NARAZ) {
 			for (int i = 0; i < 100; ++i) {
