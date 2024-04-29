@@ -258,20 +258,25 @@ static int8_t CDC_Receive_FS(uint8_t *Buf, uint32_t *Len) {
 	USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
 	USBD_CDC_ReceivePacket(&hUsbDeviceFS);
 
-	if (Buf[0] == '+') {
+	switch (Buf[0]) {
+	case '+':
 		dekrementuj_delay();
 		vypis_aktualnu_rychlost();
-	}
-
-	if (Buf[0] == '-') {
+		break;
+	case '-':
 		inkrementuj_delay();
 		vypis_aktualnu_rychlost();
-	}
-
-	if (Buf[0] == 'm') {
+		break;
+	case 'm':
 		vypni_vsetky_ledky();
 		aktualny_mod = (aktualny_mod + 1) % 3;
 		vypis_aktualny_mod();
+		break;
+	default:
+		uint8_t *data = "Zrychlit - \"+\" \r\n"
+				"Spomalit - \"-\" \r\n"
+				"Zmenit rezim - \"m\" \r\n";
+		CDC_Transmit_FS(data, strlen(data));
 	}
 
 	return (USBD_OK);
@@ -338,13 +343,12 @@ void inkrementuj_delay() {
 }
 
 void vypis_aktualnu_rychlost() {
-	char data[23]; // 23 lebo string bude mat dlzku maximalne 23
+	uint8_t *data; // 23 lebo string bude mat dlzku maximalne 23
 	snprintf(data, 23, "Aktualna rychlost: %d\r\n", 15 - delay);
 	CDC_Transmit_FS(data, strlen(data)); // posielam
 }
 
 void vypis_aktualny_mod() {
-	char str[25];
 	uint8_t *data;
 	if (aktualny_mod == MODE_VSETKY_NARAZ) {
 		data = "Aktualny mod: vsetky naraz\r\n";

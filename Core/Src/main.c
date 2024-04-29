@@ -119,10 +119,10 @@ int main(void) {
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
-	/* USER CODE BEGIN WHILE */
-	while (1) {
-// hello world:)
 
+	/* USER CODE BEGIN WHILE */
+
+	while (1) {
 		if (aktualny_mod == MODE_VSETKY_NARAZ) {
 			for (int i = 0; i < 100; ++i) {
 				__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, i * 10);
@@ -142,7 +142,7 @@ int main(void) {
 		} else if (aktualny_mod == MODE_POSTUPNE) {
 
 			for (int i = 0; i < 4; i++) {
-				for (int j = 0; j < 100; ++j) {
+				for (int j = 0; j <= 100; ++j) {
 					__HAL_TIM_SET_COMPARE(&htim4, kanaly[i], j * 10);
 					HAL_Delay(delay);
 				}
@@ -154,12 +154,15 @@ int main(void) {
 			}
 		} else if (aktualny_mod == STROBOSKOP) {
 			for (int i = 0; i < 4; i++) {
-				__HAL_TIM_SET_COMPARE(&htim4, kanaly[i], 0);
-			}
-			HAL_Delay(delay);
-			for (int i = 0; i < 4; i++) {
 				__HAL_TIM_SET_COMPARE(&htim4, kanaly[i], 1000);
 			}
+			HAL_Delay(3);
+			for (int i = 0; i < 4; i++) {
+				__HAL_TIM_SET_COMPARE(&htim4, kanaly[i], 0);
+			}
+
+			HAL_Delay(delay * 10);
+
 		}
 
 		/* USER CODE END WHILE */
