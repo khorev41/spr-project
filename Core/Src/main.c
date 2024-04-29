@@ -122,7 +122,7 @@ int main(void) {
 	/* USER CODE BEGIN WHILE */
 	while (1) {
 // hello world:)
-// danka test
+// danka test :)
 
 		if (aktualny_mod == MODE_VSETKY_NARAZ) {
 			for (int i = 0; i < 100; ++i) {
